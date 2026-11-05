@@ -2,6 +2,11 @@ node_modules/
 .wrangler/
 .dev.vars
 .env*
+!.env.example
 migration-data/
+*.sqlite*
 .qa/
+test-results/
+playwright-report/
 deployment/
+public/vendor/

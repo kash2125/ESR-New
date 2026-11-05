@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="theme.js"></script>
+    <title>Add Project</title>
+    <style>
+      body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:linear-gradient(180deg,#f3f7ff 0%,#eef3fb 100%); color:#172033; }
+      .shell { max-width:860px; margin:0 auto; padding:28px 18px 42px; }
+      .card { background:#fff; border-radius:24px; box-shadow:0 18px 50px rgba(27,39,94,.10); border:1px solid rgba(23,32,51,.08); padding:24px; }
+      h1 { margin:0 0 6px; font-size:30px; }
+      p { margin:0 0 18px; color:#5c6680; }
+      .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      .fieldFull { grid-column:1 / -1; }
+      label { display:block; margin:4px 0 6px; font-weight:700; }
+      input, select, textarea { width:100%; box-sizing:border-box; padding:12px 14px; border-radius:14px; border:1px solid rgba(23,32,51,.14); font-size:15px; font-family:inherit; background:#fff; color:#172033; }
+      textarea { min-height:140px; resize:vertical; }
+      .editorTools { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+      .toolLabel { font-size:13px; font-weight:700; color:#4d5d79; }
+      .toolButton { min-height:40px; padding:0 16px; border-radius:12px; border:1px solid rgba(23,32,51,.12); background:#fff; color:#172033; cursor:pointer; font-weight:700; }
+      .toolButtonHighlight { background:#fff2a8; border-color:#e6c84f; color:#172033; }
+      .toolButtonActive { box-shadow:0 0 0 4px rgba(39,94,254,.10); border-color:rgba(39,94,254,.45); }
+      .editorNote { margin:0 0 10px; color:#5c6680; font-size:13px; }
+      .richEditor { width:100%; min-height:180px; padding:12px 14px; border-radius:14px; border:1px solid rgba(23,32,51,.14); font-size:15px; font-family:inherit; background:#fff; color:#172033; line-height:1.6; outline:none; box-sizing:border-box; }
+      .richEditor:focus { border-color:rgba(39,94,254,.45); box-shadow:0 0 0 4px rgba(39,94,254,.08); }
+      .richEditor p, .richEditor div { margin:0 0 8px; }
+      .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+      .actions button, .actions a { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 18px; border-radius:14px; font-weight:700; text-decoration:none; }
+      .actions button { border:0; background:#275efe; color:#fff; cursor:pointer; }
+      .actions button:disabled { opacity:.65; cursor:not-allowed; }
+      .actions a { background:#eef3ff; color:#1e3a8a; }
+      .flash { margin:0 0 16px; padding:12px 14px; border-radius:12px; background:#fff4e5; color:#9a4d00; border:1px solid rgba(245,159,0,.25); }
+      .flash.success { background:#ecfdf3; color:#166534; border-color:rgba(34,197,94,.25); }
+      .flash.error { background:#fff4e5; color:#9a4d00; border-color:rgba(245,159,0,.25); }
+      .historyBox {
+        margin-top: 10px;
+        padding: 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(23,32,51,.14);
+        background: #f8faff;
+        max-height: 450px;
+        overflow-y: auto;
+      }
+
+      .historyEntry {
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid rgba(23,32,51,.12);
+      }
+
+      .historyEntry:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .historyDate {
+        font-weight: 700;
+        color: #172033;
+        margin-bottom: 8px;
+      }
+
+      .historyText {
+        color: #5c6680;
+        line-height: 1.6;
+      }
+      .historyEditItem {
+        padding: 14px;
+        margin-bottom: 14px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid rgba(23,32,51,.10);
+      }
+      .historyEditItem:last-child { margin-bottom: 0; }
+      .historyEditLabel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: #5c6680;
+      }
+      .historyEditButton {
+        min-height: 32px;
+        padding: 0 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(39,94,254,.18);
+        background: #eef3ff;
+        color: #1e3a8a;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .historyLockedMeta {
+        margin-bottom: 10px;
+        color: #172033;
+        line-height: 1.5;
+      }
+      .historyLockedMeta strong { font-weight: 800; }
+      .historyEditable {
+        color: #172033;
+        line-height: 1.6;
+        outline: none;
+      }
+      .historyEditable[contenteditable="false"] {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: default;
+      }
+      .historyEditable[contenteditable="true"] {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        cursor: text;
+      }
+      .historyEditable:focus {
+        border-color: transparent;
+        box-shadow: none;
+      }
+      .historyEditStamp {
+        margin-top: 8px;
+        color: #6f7890;
+        font-size: 13px;
+        font-style: italic;
+      }
+      :root[data-theme="dark"] body { background:linear-gradient(180deg,#0f172a 0%,#111827 100%); color:#e5e7eb; }
+      :root[data-theme="dark"] .card { background:#1f2937; border-color:rgba(255,255,255,.10); box-shadow:0 18px 50px rgba(0,0,0,.30); }
+      :root[data-theme="dark"] p, :root[data-theme="dark"] .toolLabel, :root[data-theme="dark"] .editorNote, :root[data-theme="dark"] .historyText, :root[data-theme="dark"] .historyEditLabel, :root[data-theme="dark"] .historyEditStamp { color:#aeb8ca; }
+      :root[data-theme="dark"] input, :root[data-theme="dark"] select, :root[data-theme="dark"] textarea, :root[data-theme="dark"] .richEditor, :root[data-theme="dark"] .toolButton { background:#111827; color:#e5e7eb; border-color:rgba(255,255,255,.16); }
+      :root[data-theme="dark"] .toolButtonHighlight { background:#66571b; color:#fff5bd; border-color:#9b8430; }
+      :root[data-theme="dark"] .actions a, :root[data-theme="dark"] .historyEditButton { background:#263a66; color:#dbe7ff; }
+      :root[data-theme="dark"] .historyBox { background:#111827; border-color:rgba(255,255,255,.16); }
+      :root[data-theme="dark"] .historyEntry { border-color:rgba(255,255,255,.12); }
+      :root[data-theme="dark"] .historyEditItem { background:#1f2937; border-color:rgba(255,255,255,.10); }
+      :root[data-theme="dark"] .historyDate, :root[data-theme="dark"] .historyLockedMeta, :root[data-theme="dark"] .historyEditable { color:#e5e7eb; }
+      @media (max-width:680px) { .grid { grid-template-columns:1fr; } }
+    </style>
+    <link rel="stylesheet" href="next.css">
+  <script src="next.js" defer></script>
+</head>
+
+  <body>
+    <div class="shell">
+      <div class="card">
+        <h1>Edit Project</h1>
+        <p>Update the project details below. Saving will refresh the dashboard.</p>
+
+        <div id="pageMessage" class="flash" style="display:none;"></div>
+
+        <form id="projectForm">
+          <div class="grid">
+            <div>
+              <label for="project_number">Project Number</label>
+              <input id="project_number" name="project_number" type="text" required />
+            </div>
+
+            <div>
+              <label for="engineer">Project Engineer</label>
+              <select id="engineer" name="engineer" required>
+                <option value="">Select Project Engineer</option>
+                <option value="Behrad">Behrad</option>
+                <option value="Jaime">Jaime</option>
+                <option value="Kash">Kash</option>
+                <option value="Shawn">Shawn</option>
+                <option value="Xiaohan">Xiaohan</option>
+                <option value="Unassigned">Unassigned</option>
+              </select>
+            </div>
+
+            <div class="fieldFull">
+              <label for="project_name">Project Name</label>
+              <input id="project_name" name="project_name" type="text" required />
+            </div>
+
+            <div>
+              <label for="project_status">Request Type</label>
+              <select id="project_status" name="project_status" required>
+                <option value="No Contract">No Contract</option>
+                <option value="Contract">Contract</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="sales_person">Sales Person</label>
+              <select id="sales_person" name="sales_person" required>
+                <option value="">Select Sales Person</option>
+                <option value="Victor Sanchez">Victor Sanchez</option>
+                <option value="Michael Howlett">Michael Howlett</option>
+                <option value="David Newell">David Newell</option>
+                <option value="Brad Quay">Brad Quay</option>
+                <option value="Max Diaz">Max Diaz</option>
+                <option value="Francis Tenggardjaja">Francis Tenggardjaja</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="start_date">Start Date</label>
+              <input id="start_date" name="start_date" type="date" required />
+            </div>
+
+            <div class="fieldFull">
+              <label for="descriptionEditor">Description</label>
+
+              <div class="editorTools">
+                <span class="toolLabel">Text tools</span>
+                <button class="toolButton" id="applyBoldText" type="button">Bold</button>
+                <button class="toolButton toolButtonHighlight" id="applyHighlightText" type="button">Highlight</button>
+              </div>
+
+              <div class="editorNote">Click a tool to turn it on for what you type next, or select words first to format them. Saving timestamps the newest update.</div>
+
+              <label>Latest Update</label>
+              <div id="descriptionEditor" class="richEditor" contenteditable="true"></div>
+              <div class="fieldFull">
+                <label>Previous Updates</label>
+
+                <div id="historyContainer" class="historyBox">
+                </div>
+              </div>
+              <input id="description" name="description" type="hidden" />
+              <input id="description_color" name="description_color" type="hidden" value="#000000" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="saveProjectBtn" type="submit">Update Project</button>
+            <a href="index.html">Back to dashboard</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="projects.js"></script>
+    <script src="dataClient.js"></script>
+    
+
+    <script>
+       async function requireLogin() {
+          const { data, error } = await appAuth.auth.getSession();
+
+          if (error || !data.session) {
+            window.location.href = "login.html";
+            return false;
+          }
+
+          console.log("Logged in as:", data.session.user.email);
+          return true;
+        }
+    </script>
+
+    <script>
+      const editor = document.getElementById("descriptionEditor");
+      const hiddenDescription = document.getElementById("description");
+      const applyBoldButton = document.getElementById("applyBoldText");
+      const applyHighlightButton = document.getElementById("applyHighlightText");
+      const descriptionColorInput = document.getElementById("description_color");
+      const form = document.getElementById("projectForm");
+      const saveProjectBtn = document.getElementById("saveProjectBtn");
+      const pageMessage = document.getElementById("pageMessage");
+      const params = new URLSearchParams(window.location.search);
+      const originalProjectNumber = params.get("project");
+
+      let savedRange = null;
+      let existingDescriptionHtml = "";
+      let existingProject = null;
+      let highlightActive = false;
+
+      function showMessage(text, type = "error") {
+        pageMessage.textContent = text;
+        pageMessage.className = `flash ${type}`;
+        pageMessage.style.display = "block";
+      }
+
+      function syncEditorToInput() {
+        if (!editor || !hiddenDescription) return;
+        hiddenDescription.value = editor.innerHTML.trim();
+      }
+
+      function getSelectionRangeInsideEditor() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return null;
+
+        const range = selection.getRangeAt(0);
+        if (!editor.contains(range.commonAncestorContainer)) return null;
+
+        return range;
+      }
+
+      function rememberSelection() {
+        const range = getSelectionRangeInsideEditor();
+        if (range) savedRange = range.cloneRange();
+      }
+
+      function restoreSelection() {
+        if (!savedRange) return null;
+
+        const selection = window.getSelection();
+        if (!selection) return null;
+
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+
+        return savedRange;
+      }
+
+      function normalizeEditorMarkup() {
+        if (!editor) return;
+
+        editor.querySelectorAll("font").forEach(node => {
+          const span = document.createElement("span");
+          const color = (node.getAttribute("color") || "").toLowerCase();
+
+          if (color === "#c62828" || color === "red") {
+            span.style.color = "#c62828";
+          } else if (color) {
+            span.style.color = "#000000";
+          }
+
+          span.innerHTML = node.innerHTML;
+          node.replaceWith(span);
+        });
+
+        editor.querySelectorAll("span").forEach(span => {
+          const rawStyle = (span.getAttribute("style") || "").toLowerCase();
+          let normalizedColor = "";
+
+          if (
+            rawStyle.includes("background-color") ||
+            rawStyle.includes("background:") ||
+            rawStyle.includes("yellow") ||
+            rawStyle.includes("#fff2a8") ||
+            rawStyle.includes("rgb(255, 242, 168)")
+          ) {
+            const mark = document.createElement("mark");
+            mark.innerHTML = span.innerHTML;
+            span.replaceWith(mark);
+            return;
+          }
+
+          if (
+            rawStyle.includes("#c62828") ||
+            rawStyle.includes("red") ||
+            rawStyle.includes("rgb(198, 40, 40)") ||
+            rawStyle.includes("rgb(198,40,40)") ||
+            rawStyle.includes("rgb(255, 0, 0)") ||
+            rawStyle.includes("rgb(255,0,0)")
+          ) {
+            normalizedColor = "#c62828";
+          } else if (
+            rawStyle.includes("#000000") ||
+            rawStyle.includes("black") ||
+            rawStyle.includes("rgb(0, 0, 0)") ||
+            rawStyle.includes("rgb(0,0,0)")
+          ) {
+            normalizedColor = "#000000";
+          }
+
+          if (normalizedColor) {
+            span.setAttribute("style", `color: ${normalizedColor};`);
+          } else {
+            const parent = span.parentNode;
+            while (span.firstChild) parent.insertBefore(span.firstChild, span);
+            parent.removeChild(span);
+          }
+        });
+      }
+
+      function updateToolButtonStates() {
+        if (applyBoldButton) {
+          applyBoldButton.classList.toggle("toolButtonActive", document.queryCommandState("bold"));
+        }
+        if (applyHighlightButton) {
+          applyHighlightButton.classList.toggle("toolButtonActive", highlightActive);
+        }
+      }
+
+      function selectionHasText(range) {
+        return !!range && !range.collapsed && !!range.toString().trim();
+      }
+
+      function applyEditorCommand(command) {
+        if (!editor) return;
+
+        editor.focus();
+
+        const range = restoreSelection() || getSelectionRangeInsideEditor();
+        if (range) {
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        }
+
+        if (command === "bold") {
+          document.execCommand("bold", false, null);
+        } else if (command === "highlight") {
+          highlightActive = selectionHasText(range) ? true : !highlightActive;
+          document.execCommand("hiliteColor", false, highlightActive ? "#fff2a8" : "transparent");
+          document.execCommand("backColor", false, highlightActive ? "#fff2a8" : "transparent");
+        }
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+        rememberSelection();
+        updateToolButtonStates();
+      }
+
+      function wrapSelectionWithTag(tagName) {
+        if (!editor) return;
+
+        editor.focus();
+
+        const range = restoreSelection() || getSelectionRangeInsideEditor();
+        if (!range || range.collapsed) return;
+
+        const extracted = range.extractContents();
+        if (!extracted.textContent || !extracted.textContent.trim()) return;
+
+        const wrapper = document.createElement(tagName);
+        wrapper.appendChild(extracted);
+        range.insertNode(wrapper);
+
+        const newRange = document.createRange();
+        newRange.selectNodeContents(wrapper);
+        savedRange = newRange.cloneRange();
+
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+      }
+
+      function wrapSelectionWithHighlight() {
+        if (!editor) return;
+
+        editor.focus();
+
+        const range = restoreSelection() || getSelectionRangeInsideEditor();
+        if (!range || range.collapsed) return;
+
+        const extracted = range.extractContents();
+        if (!extracted.textContent || !extracted.textContent.trim()) return;
+
+        const wrapper = document.createElement("mark");
+        wrapper.appendChild(extracted);
+        range.insertNode(wrapper);
+
+        const newRange = document.createRange();
+        newRange.selectNodeContents(wrapper);
+        savedRange = newRange.cloneRange();
+
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+      }
+
+      function getTimestampLabel() {
+        return new Date().toLocaleString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "numeric",
+          minute: "2-digit"
+        });
+      }
+
+      function buildTimestampedDescription(newHtml, oldHtml = "") {
+        const cleanNew = String(newHtml || "").trim();
+        const cleanOld = String(oldHtml || "").trim();
+
+        if (!textContentFromHtml(cleanNew)) {
+          return cleanOld;
+        }
+
+        const entry = `
+          <div class="descriptionEntry">
+            <div><strong>${getTimestampLabel()}</strong></div>
+            <div>${cleanNew}</div>
+          </div>
+        `;
+
+        return cleanOld ? `${entry}<hr>${cleanOld}` : entry;
+      }
+
+      function normalizeHistoryHtml(value) {
+        const temp = document.createElement("template");
+        temp.innerHTML = String(value || "").trim();
+        temp.content.querySelectorAll(".updateSectionTitle").forEach(el => el.remove());
+        return temp.innerHTML.replace(/\s+/g, " ").trim();
+      }
+
+      function splitDescriptionHistory(descriptionHtml) {
+        const template = document.createElement("template");
+        template.innerHTML = String(descriptionHtml || "").trim();
+
+        const allPreviousBox = template.content.querySelector("[data-all-previous-updates='true']");
+        if (allPreviousBox) {
+          return Array.from(allPreviousBox.querySelectorAll(".descriptionEntry, .projectUpdate"))
+            .map(entry => entry.innerHTML.trim())
+            .filter(Boolean);
+        }
+
+        const latestUpdateBox = template.content.querySelector(".latestUpdateBox");
+        if (latestUpdateBox) {
+          const entries = [];
+          const latestContent = latestUpdateBox.querySelector(".latestUpdateContent, .projectUpdate");
+          if (latestContent?.innerHTML.trim()) entries.push(latestContent.innerHTML.trim());
+
+          const previousRoot = template.content.querySelector(".previousUpdatesBox") || template.content;
+          entries.push(
+            ...Array.from(previousRoot.querySelectorAll(".descriptionEntry, .projectUpdate"))
+              .filter(entry => !latestUpdateBox.contains(entry))
+              .map(entry => entry.innerHTML.trim())
+              .filter(Boolean)
+          );
+          return entries;
+        }
+
+        const explicitEntries = Array.from(template.content.querySelectorAll(".descriptionEntry, .projectUpdate"));
+        if (explicitEntries.length) {
+          return explicitEntries.map(entry => entry.innerHTML.trim()).filter(Boolean);
+        }
+
+        const entries = [];
+        let current = [];
+        Array.from(template.content.childNodes).forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "HR") {
+            const html = current.map(item => item.outerHTML || item.textContent || "").join("").trim();
+            if (html) entries.push(html);
+            current = [];
+          } else {
+            current.push(node.cloneNode(true));
+          }
+        });
+
+        const finalHtml = current.map(item => item.outerHTML || item.textContent || "").join("").trim();
+        if (finalHtml) entries.push(finalHtml);
+
+        return entries;
+      }
+
+      function parseHistoryEntry(entryHtml) {
+        const template = document.createElement("template");
+        template.innerHTML = String(entryHtml || "").trim();
+        const timestampPattern = /^\d{2}\/\d{2}\/\d{4},\s+\d{1,2}:\d{2}\s+[AP]M$/i;
+        const toHtml = nodes => Array.from(nodes)
+          .map(node => node.outerHTML || node.textContent || "")
+          .join("")
+          .trim();
+        const getLeadingContentNode = parent => Array.from(parent.childNodes)
+          .find(node => node.nodeType !== Node.TEXT_NODE || node.textContent.trim());
+        const removeLeadingBreaks = parent => {
+          while (
+            parent.firstChild &&
+            (
+              (parent.firstChild.nodeType === Node.TEXT_NODE && !parent.firstChild.textContent.trim()) ||
+              (parent.firstChild.nodeType === Node.ELEMENT_NODE && parent.firstChild.tagName === "BR")
+            )
+          ) {
+            parent.firstChild.remove();
+          }
+        };
+        const pullTimestampFromParent = parent => {
+          const firstNode = getLeadingContentNode(parent);
+          if (!firstNode || firstNode.nodeType !== Node.ELEMENT_NODE) return "";
+
+          const timestampText = firstNode.textContent.replace(/\s+/g, " ").trim();
+          const isTimestampNode =
+            timestampPattern.test(timestampText) &&
+            (
+              firstNode.tagName === "STRONG" ||
+              firstNode.tagName === "B" ||
+              firstNode.querySelector("strong, b")
+            );
+
+          if (!isTimestampNode) return "";
+
+          firstNode.remove();
+          removeLeadingBreaks(parent);
+          return `<div><strong>${timestampText}</strong></div>`;
+        };
+
+        const editStamps = Array.from(template.content.querySelectorAll(".historyEditStamp"));
+        const editStampHtml = editStamps.map(stamp => stamp.outerHTML).join("");
+        editStamps.forEach(stamp => stamp.remove());
+
+        let timestampHtml = "";
+        const firstElement = Array.from(template.content.children)[0];
+        const firstElementText = (firstElement?.textContent || "").replace(/\s+/g, " ").trim();
+        const hasTimestampText = timestampPattern.test(firstElementText);
+        if (firstElement?.querySelector("strong") && hasTimestampText) {
+          timestampHtml = firstElement.outerHTML;
+          firstElement.remove();
+        }
+
+        let bodyHtml = template.innerHTML.trim();
+        const bodyTemplate = document.createElement("template");
+        bodyTemplate.innerHTML = bodyHtml;
+        const bodyChildren = Array.from(bodyTemplate.content.children);
+        if (bodyChildren.length === 1 && bodyChildren[0].tagName === "DIV") {
+          if (!timestampHtml) {
+            timestampHtml = pullTimestampFromParent(bodyChildren[0]);
+          }
+          bodyHtml = bodyChildren[0].innerHTML.trim();
+        } else {
+          if (!timestampHtml) {
+            timestampHtml = pullTimestampFromParent(bodyTemplate.content);
+          }
+          bodyHtml = toHtml(bodyTemplate.content.childNodes);
+        }
+
+        return {
+          timestampHtml,
+          bodyHtml,
+          editStampHtml
+        };
+      }
+
+      function renderEditableHistory(descriptionHtml) {
+        const historyContainer = document.getElementById("historyContainer");
+        if (!historyContainer) return;
+
+        const entries = splitDescriptionHistory(descriptionHtml);
+
+        if (!entries.length) {
+          historyContainer.innerHTML = "<div class='historyText'>No previous updates yet.</div>";
+          return;
+        }
+
+        historyContainer.innerHTML = entries.map((entry, index) => {
+          const parsedEntry = parseHistoryEntry(entry);
+          const timestampHtml = parsedEntry.timestampHtml;
+          const originalBody = normalizeHistoryHtml(parsedEntry.bodyHtml);
+
+          return `
+          <div class="historyEditItem">
+            <div class="historyEditLabel">
+              <span>Previous Update ${index + 1}</span>
+              <button class="historyEditButton" type="button">Edit</button>
+            </div>
+            <div class="historyLockedMeta" data-timestamp-html="${encodeURIComponent(parsedEntry.timestampHtml)}" data-edit-stamps-html="${encodeURIComponent(parsedEntry.editStampHtml)}" ${timestampHtml || parsedEntry.editStampHtml ? "" : "hidden"}>
+              ${timestampHtml}${parsedEntry.editStampHtml}
+            </div>
+            <div class="historyEditable" contenteditable="false" data-original-body="${encodeURIComponent(originalBody)}">${parsedEntry.bodyHtml}</div>
+          </div>
+        `;
+        }).join("");
+      }
+
+      function collectEditedHistoryHtml() {
+        const historyContainer = document.getElementById("historyContainer");
+        if (!historyContainer) return "";
+
+        return Array.from(historyContainer.querySelectorAll(".historyEditItem"))
+          .map(item => {
+            const entry = item.querySelector(".historyEditable");
+            const meta = item.querySelector(".historyLockedMeta");
+            if (!entry || !meta) return "";
+
+            const original = decodeURIComponent(entry.dataset.originalBody || "");
+            const current = entry.innerHTML.trim();
+            const timestampHtml = decodeURIComponent(meta.dataset.timestampHtml || "");
+            let editStampHtml = decodeURIComponent(meta.dataset.editStampsHtml || "");
+
+            if (!current) return "";
+
+            if (normalizeHistoryHtml(current) !== original) {
+              editStampHtml += `<div class="historyEditStamp">Edited ${getTimestampLabel()}</div>`;
+            }
+
+            return `${timestampHtml}<div>${current}</div>${editStampHtml}`;
+          })
+          .filter(Boolean)
+          .join("<hr>");
+      }
+
+      function initHistoryEditButtons() {
+        const historyContainer = document.getElementById("historyContainer");
+        if (!historyContainer) return;
+
+        historyContainer.addEventListener("click", event => {
+          const button = event.target.closest(".historyEditButton");
+          if (!button) return;
+
+          const item = button.closest(".historyEditItem");
+          const editable = item?.querySelector(".historyEditable");
+          if (!editable) return;
+
+          const isEditing = editable.getAttribute("contenteditable") === "true";
+          editable.setAttribute("contenteditable", isEditing ? "false" : "true");
+          item.classList.toggle("isEditing", !isEditing);
+          button.textContent = isEditing ? "Edit" : "Done";
+          button.setAttribute("aria-pressed", String(!isEditing));
+
+          if (!isEditing) {
+            editable.focus();
+            const range = document.createRange();
+            range.selectNodeContents(editable);
+            range.collapse(false);
+            const selection = window.getSelection();
+            if (selection) {
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+          } else {
+            editable.blur();
+          }
+        });
+      }
+
+      function rememberSelectionFromEvent() {
+        rememberSelection();
+      }
+
+      [applyBoldButton, applyHighlightButton].forEach(control => {
+        if (!control) return;
+
+        control.addEventListener("mousedown", event => {
+          event.preventDefault();
+          rememberSelection();
+        });
+      });
+
+      if (applyBoldButton) {
+        applyBoldButton.addEventListener("click", () => applyEditorCommand("bold"));
+      }
+
+      if (applyHighlightButton) {
+        applyHighlightButton.addEventListener("click", () => applyEditorCommand("highlight"));
+      }
+
+      if (editor) {
+        editor.addEventListener("mouseup", rememberSelectionFromEvent);
+        editor.addEventListener("keyup", rememberSelectionFromEvent);
+        editor.addEventListener("focus", rememberSelectionFromEvent);
+        editor.addEventListener("keyup", updateToolButtonStates);
+        editor.addEventListener("mouseup", updateToolButtonStates);
+
+        editor.addEventListener("input", () => {
+          normalizeEditorMarkup();
+          syncEditorToInput();
+          rememberSelection();
+          updateToolButtonStates();
+        });
+
+        if (!editor.innerHTML.trim()) editor.innerHTML = "";
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+        updateToolButtonStates();
+      }
+
+      document.addEventListener("selectionchange", () => {
+        if (document.activeElement === editor || (editor && editor.contains(document.activeElement))) {
+          rememberSelection();
+        }
+      });
+
+      initHistoryEditButtons();
+      
+      async function loadProjectForEdit() {
+        if (!originalProjectNumber) {
+          showMessage("Missing project number.", "error");
+          return;
+        }
+
+        const project = await getProjectByNumber(originalProjectNumber);
+
+        if (!project) {
+          showMessage("Project not found.", "error");
+          return;
+        }
+        existingProject = project;
+
+        document.getElementById("project_number").value = project.project_number || "";
+        document.getElementById("project_name").value = project.project_name || "";
+        document.getElementById("engineer").value = project.engineer || "";
+        document.getElementById("project_status").value = normalizeProjectStatus(project.project_status || "No Contract");
+        document.getElementById("sales_person").value = project.sales_person || "";
+        document.getElementById("start_date").value = project.start_date || "";
+
+        existingDescriptionHtml = project.description || project.description_html || "";
+
+        renderEditableHistory(existingDescriptionHtml);
+
+        editor.innerHTML = "";
+        hiddenDescription.value = "";
+      }
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+        
+        const finalDescriptionHtml = buildTimestampedDescription(
+          hiddenDescription.value,
+          collectEditedHistoryHtml()
+        );
+
+        const formValues = {
+          project_number: document.getElementById("project_number").value,
+          project_name: document.getElementById("project_name").value,
+          engineer: document.getElementById("engineer").value,
+          project_status: document.getElementById("project_status").value,
+          sales_person: document.getElementById("sales_person").value,
+          start_date: document.getElementById("start_date").value,
+          completed_date: existingProject?.project_status === "Completed" ? (existingProject.completed_date || "") : "",
+          description: finalDescriptionHtml,
+          description_color: descriptionColorInput.value
+        };
+
+        const result = prepareProjectPayload(formValues);
+
+        if (result.error) {
+          showMessage(result.error, "error");
+          return;
+        }
+
+        saveProjectBtn.disabled = true;
+        saveProjectBtn.textContent = "Saving...";
+
+        try {
+          const { data: sessionData } = await appAuth.auth.getSession();
+
+          if (!sessionData.session) {
+            showMessage("You are not logged in. Please sign in again.", "error");
+            window.location.href = "login.html";
+            return;
+          }
+
+          console.log("Saving as:", sessionData.session.user.email);
+
+          await updateProject(originalProjectNumber, result.project);
+          showMessage("Project updated successfully.", "success");
+
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 700);
+        } catch (error) {
+          console.error(error);
+          showMessage(error.message || "Could not save project.", "error");
+
+          saveProjectBtn.disabled = false;
+          saveProjectBtn.textContent = "Save Project";
+        }
+      });
+      requireLogin().then(isLoggedIn => {
+        if (isLoggedIn) loadProjectForEdit();
+      });
+    </script>
+  </body>
+</html>

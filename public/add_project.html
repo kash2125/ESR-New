@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="theme.js"></script>
+    <title>Add Project</title>
+    <style>
+      body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:linear-gradient(180deg,#f3f7ff 0%,#eef3fb 100%); color:#172033; }
+      .shell { max-width:860px; margin:0 auto; padding:28px 18px 42px; }
+      .card { background:#fff; border-radius:24px; box-shadow:0 18px 50px rgba(27,39,94,.10); border:1px solid rgba(23,32,51,.08); padding:24px; }
+      h1 { margin:0 0 6px; font-size:30px; }
+      p { margin:0 0 18px; color:#5c6680; }
+      .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      .fieldFull { grid-column:1 / -1; }
+      label { display:block; margin:4px 0 6px; font-weight:700; }
+      input, select, textarea { width:100%; box-sizing:border-box; padding:12px 14px; border-radius:14px; border:1px solid rgba(23,32,51,.14); font-size:15px; font-family:inherit; background:#fff; color:#172033; }
+      textarea { min-height:140px; resize:vertical; }
+      .editorTools { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+      .toolLabel { font-size:13px; font-weight:700; color:#4d5d79; }
+      .toolButton { min-height:40px; padding:0 16px; border-radius:12px; border:1px solid rgba(23,32,51,.12); background:#fff; color:#172033; cursor:pointer; font-weight:700; }
+      .toolButtonHighlight { background:#fff2a8; border-color:#e6c84f; color:#172033; }
+      .editorNote { margin:0 0 10px; color:#5c6680; font-size:13px; }
+      .richEditor { width:100%; min-height:180px; padding:12px 14px; border-radius:14px; border:1px solid rgba(23,32,51,.14); font-size:15px; font-family:inherit; background:#fff; color:#172033; line-height:1.6; outline:none; box-sizing:border-box; }
+      .richEditor:focus { border-color:rgba(39,94,254,.45); box-shadow:0 0 0 4px rgba(39,94,254,.08); }
+      .richEditor p, .richEditor div { margin:0 0 8px; }
+      .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+      .actions button, .actions a { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 18px; border-radius:14px; font-weight:700; text-decoration:none; }
+      .actions button { border:0; background:#275efe; color:#fff; cursor:pointer; }
+      .actions button:disabled { opacity:.65; cursor:not-allowed; }
+      .actions a { background:#eef3ff; color:#1e3a8a; }
+      .flash { margin:0 0 16px; padding:12px 14px; border-radius:12px; background:#fff4e5; color:#9a4d00; border:1px solid rgba(245,159,0,.25); }
+      .flash.success { background:#ecfdf3; color:#166534; border-color:rgba(34,197,94,.25); }
+      .flash.error { background:#fff4e5; color:#9a4d00; border-color:rgba(245,159,0,.25); }
+      :root[data-theme="dark"] body { background:linear-gradient(180deg,#0f172a 0%,#111827 100%); color:#e5e7eb; }
+      :root[data-theme="dark"] .card { background:#1f2937; border-color:rgba(255,255,255,.10); box-shadow:0 18px 50px rgba(0,0,0,.30); }
+      :root[data-theme="dark"] p, :root[data-theme="dark"] .toolLabel, :root[data-theme="dark"] .editorNote { color:#aeb8ca; }
+      :root[data-theme="dark"] input, :root[data-theme="dark"] select, :root[data-theme="dark"] textarea, :root[data-theme="dark"] .richEditor, :root[data-theme="dark"] .toolButton { background:#111827; color:#e5e7eb; border-color:rgba(255,255,255,.16); }
+      :root[data-theme="dark"] .toolButtonHighlight { background:#66571b; color:#fff5bd; border-color:#9b8430; }
+      :root[data-theme="dark"] .actions a { background:#263a66; color:#dbe7ff; }
+      @media (max-width:680px) { .grid { grid-template-columns:1fr; } }
+    </style>
+    <link rel="stylesheet" href="next.css">
+  <script src="next.js" defer></script>
+</head>
+
+  <body>
+    <div class="shell">
+      <div class="card">
+        <h1>Add Project</h1>
+        <p>Fill in the project details below. Once submitted, the dashboard updates automatically.</p>
+
+        <div id="pageMessage" class="flash" style="display:none;"></div>
+
+        <form id="projectForm">
+          <div class="grid">
+            <div>
+              <label for="project_number">Project Number</label>
+              <input id="project_number" name="project_number" type="text" required />
+            </div>
+
+            <div>
+              <label for="engineer">Project Engineer</label>
+              <select id="engineer" name="engineer" required>
+                <option value="">Select Project Engineer</option>
+                <option value="Behrad">Behrad</option>
+                <option value="Jaime">Jaime</option>
+                <option value="Kash">Kash</option>
+                <option value="Shawn">Shawn</option>
+                <option value="Xiaohan">Xiaohan</option>
+                <option value="Unassigned">Unassigned</option>
+              </select>
+            </div>
+
+            <div class="fieldFull">
+              <label for="project_name">Project Name</label>
+              <input id="project_name" name="project_name" type="text" required />
+            </div>
+
+            <div>
+              <label for="project_status">Request Type</label>
+              <select id="project_status" name="project_status" required>
+                <option value="No Contract">No Contract</option>
+                <option value="Contract">Contract</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="sales_person">Sales Person</label>
+              <select id="sales_person" name="sales_person" required>
+                <option value="">Select Sales Person</option>
+                <option value="Victor Sanchez">Victor Sanchez</option>
+                <option value="Michael Howlett">Michael Howlett</option>
+                <option value="David Newell">David Newell</option>
+                <option value="Brad Quay">Brad Quay</option>
+                <option value="Max Diaz">Max Diaz</option>
+                <option value="Francis Tenggardjaja">Francis Tenggardjaja</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="start_date">Start Date</label>
+              <input id="start_date" name="start_date" type="date" required />
+            </div>
+
+            <div class="fieldFull">
+              <label for="descriptionEditor">Description</label>
+
+              <div class="editorTools">
+                <span class="toolLabel">Text tools</span>
+                <button class="toolButton" id="applyBoldText" type="button">Bold</button>
+                <button class="toolButton toolButtonHighlight" id="applyHighlightText" type="button">Highlight</button>
+              </div>
+
+              <di<div class="editorNote">Type the newest update here. When saved, it will be timestamped and placed at the top.</div>
+
+              <div id="descriptionEditor" class="richEditor" contenteditable="true"></div>
+              <input id="description" name="description" type="hidden" />
+              <input id="description_color" name="description_color" type="hidden" value="#000000" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="saveProjectBtn" type="submit">Save Project</button>
+            <a href="index.html">Back to dashboard</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="projects.js"></script>
+    <script src="dataClient.js"></script>
+
+    <script>
+      const editor = document.getElementById("descriptionEditor");
+      const hiddenDescription = document.getElementById("description");
+      const applyBoldButton = document.getElementById("applyBoldText");
+      const applyHighlightButton = document.getElementById("applyHighlightText");
+      const descriptionColorInput = document.getElementById("description_color");
+      const form = document.getElementById("projectForm");
+      const saveProjectBtn = document.getElementById("saveProjectBtn");
+      const pageMessage = document.getElementById("pageMessage");
+
+      let savedRange = null;
+
+      function showMessage(text, type = "error") {
+        pageMessage.textContent = text;
+        pageMessage.className = `flash ${type}`;
+        pageMessage.style.display = "block";
+      }
+
+      function syncEditorToInput() {
+        if (!editor || !hiddenDescription) return;
+        hiddenDescription.value = editor.innerHTML.trim();
+      }
+
+      function getSelectionRangeInsideEditor() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return null;
+
+        const range = selection.getRangeAt(0);
+        if (!editor.contains(range.commonAncestorContainer)) return null;
+
+        return range;
+      }
+
+      function rememberSelection() {
+        const range = getSelectionRangeInsideEditor();
+        if (range) savedRange = range.cloneRange();
+      }
+
+      function restoreSelection() {
+        if (!savedRange) return null;
+
+        const selection = window.getSelection();
+        if (!selection) return null;
+
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+
+        return savedRange;
+      }
+
+      function normalizeEditorMarkup() {
+        if (!editor) return;
+
+        editor.querySelectorAll("font").forEach(node => {
+          const span = document.createElement("span");
+          const color = (node.getAttribute("color") || "").toLowerCase();
+
+          if (color === "#c62828" || color === "red") {
+            span.style.color = "#c62828";
+          } else if (color) {
+            span.style.color = "#000000";
+          }
+
+          span.innerHTML = node.innerHTML;
+          node.replaceWith(span);
+        });
+
+        editor.querySelectorAll("span").forEach(span => {
+          const rawStyle = (span.getAttribute("style") || "").toLowerCase();
+          let normalizedColor = "";
+
+          if (
+            rawStyle.includes("#c62828") ||
+            rawStyle.includes("red") ||
+            rawStyle.includes("rgb(198, 40, 40)") ||
+            rawStyle.includes("rgb(198,40,40)") ||
+            rawStyle.includes("rgb(255, 0, 0)") ||
+            rawStyle.includes("rgb(255,0,0)")
+          ) {
+            normalizedColor = "#c62828";
+          } else if (
+            rawStyle.includes("#000000") ||
+            rawStyle.includes("black") ||
+            rawStyle.includes("rgb(0, 0, 0)") ||
+            rawStyle.includes("rgb(0,0,0)")
+          ) {
+            normalizedColor = "#000000";
+          }
+
+          if (normalizedColor) {
+            span.setAttribute("style", `color: ${normalizedColor};`);
+          } else {
+            const parent = span.parentNode;
+            while (span.firstChild) parent.insertBefore(span.firstChild, span);
+            parent.removeChild(span);
+          }
+        });
+      }
+
+      function wrapSelectionWithColor(hexColor) {
+        if (!editor) return;
+
+        editor.focus();
+
+        const range = restoreSelection() || getSelectionRangeInsideEditor();
+        if (!range || range.collapsed) return;
+
+        const extracted = range.extractContents();
+        if (!extracted.textContent || !extracted.textContent.trim()) return;
+
+        const wrapper = document.createElement("span");
+        wrapper.setAttribute("style", `color: ${hexColor};`);
+        wrapper.appendChild(extracted);
+        range.insertNode(wrapper);
+
+        const newRange = document.createRange();
+        newRange.selectNodeContents(wrapper);
+        savedRange = newRange.cloneRange();
+
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+
+        normalizeEditorMarkup();
+
+        if (descriptionColorInput) {
+          descriptionColorInput.value = hexColor;
+        }
+
+        syncEditorToInput();
+      }
+
+      function rememberSelectionFromEvent() {
+        rememberSelection();
+      }
+
+      [applyBoldButton, applyHighlightButton].forEach(control => {
+        if (!control) return;
+
+        control.addEventListener("mousedown", event => {
+          event.preventDefault();
+          rememberSelection();
+        });
+      });
+
+      if (applyBoldButton) {
+        applyBoldButton.addEventListener("click", () => wrapSelectionWithTag("strong"));
+      }
+
+      if (applyHighlightButton) {
+        applyHighlightButton.addEventListener("click", () => wrapSelectionWithHighlight());
+      }
+
+      if (editor) {
+        editor.addEventListener("mouseup", rememberSelectionFromEvent);
+        editor.addEventListener("keyup", rememberSelectionFromEvent);
+        editor.addEventListener("focus", rememberSelectionFromEvent);
+
+        editor.addEventListener("input", () => {
+          normalizeEditorMarkup();
+          syncEditorToInput();
+          rememberSelection();
+        });
+
+        if (!editor.innerHTML.trim()) editor.innerHTML = "";
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+      }
+
+      document.addEventListener("selectionchange", () => {
+        if (document.activeElement === editor || (editor && editor.contains(document.activeElement))) {
+          rememberSelection();
+        }
+      });
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        normalizeEditorMarkup();
+        syncEditorToInput();
+
+        const formValues = {
+          project_number: document.getElementById("project_number").value,
+          project_name: document.getElementById("project_name").value,
+          engineer: document.getElementById("engineer").value,
+          project_status: document.getElementById("project_status").value,
+          sales_person: document.getElementById("sales_person").value,
+          start_date: document.getElementById("start_date").value,
+          description: hiddenDescription.value,
+          description_color: descriptionColorInput.value
+        };
+
+        const result = prepareProjectPayload(formValues);
+
+        if (result.error) {
+          showMessage(result.error, "error");
+          return;
+        }
+
+        saveProjectBtn.disabled = true;
+        saveProjectBtn.textContent = "Saving...";
+
+        try {
+          await insertProject(result.project);
+
+          showMessage("Project saved successfully.", "success");
+
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 700);
+        } catch (error) {
+          console.error(error);
+          showMessage(error.message || "Could not save project.", "error");
+
+          saveProjectBtn.disabled = false;
+          saveProjectBtn.textContent = "Save Project";
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+import fs from 'node:fs/promises';
+const publicDir = new URL('../public/', import.meta.url);
+const pdfDir = new URL('../node_modules/pdfjs-dist/', import.meta.url);
+await fs.mkdir(new URL('vendor/pdf-lib/', publicDir), { recursive: true });
+for (const name of ['pdf.mjs', 'pdf.worker.mjs']) await fs.copyFile(new URL('build/' + name, pdfDir), new URL('vendor/' + name, publicDir));
+for (const name of ['standard_fonts', 'cmaps', 'wasm']) await fs.cp(new URL(name, pdfDir), new URL('vendor/' + name, publicDir), { recursive: true });
+await fs.copyFile(new URL('LICENSE', pdfDir), new URL('vendor/PDFJS-LICENSE', publicDir));
+await fs.copyFile(new URL('../node_modules/pdf-lib/dist/pdf-lib.min.js', import.meta.url), new URL('vendor/pdf-lib/pdf-lib.min.js', publicDir));
+await fs.mkdir(new URL('vendor/chart/', publicDir), { recursive: true });
+await fs.copyFile(new URL('../node_modules/chart.js/dist/chart.umd.js', import.meta.url), new URL('vendor/chart/chart.umd.js', publicDir));
+await fs.copyFile(new URL('../node_modules/chart.js/LICENSE.md', import.meta.url), new URL('vendor/chart/LICENSE.md', publicDir));
+await fs.copyFile(new URL('../node_modules/pdf-lib/LICENSE.md', import.meta.url), new URL('vendor/pdf-lib/LICENSE.md', publicDir));
+console.log('Built local chart and PDF assets from the locked dependency versions.');

@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "esr-new",
+  "pages_build_output_dir": "./deployment",
+  "compatibility_date": "2026-11-05",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "esr-next",
+      "database_id": "6ba20348-5122-41be-a675-74a6ee21b35c",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "EDIT_ALLOWED_EMAILS": "engineering@nswash.com",
+    "DELETE_ALLOWED_EMAILS": "engineering@nswash.com"
+  }
+}

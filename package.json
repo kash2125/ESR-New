@@ -1,0 +1,28 @@
+{
+  "name": "esr-next",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/prepare-assets.mjs",
+    "dev": "wrangler dev --config wrangler.worker.jsonc --ip 127.0.0.1 --port 8788",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node tools/check-source.mjs",
+    "package:pages": "npm run build && node tools/package-pages.mjs",
+    "deploy": "npm run package:pages && wrangler pages deploy deployment --project-name esr-new --branch main",
+    "test:browser": "node tools/browser-check.mjs",
+    "db:local": "wrangler d1 migrations apply esr-next --local",
+    "db:remote": "wrangler d1 migrations apply esr-next --remote"
+  },
+  "dependencies": {
+    "sanitize-html": "^2.17.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "chart.js": "^4.6.1",
+    "esbuild": "^0.28.2",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.5.438",
+    "wrangler": "^4.0.0"
+  }
+}

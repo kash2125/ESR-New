@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+import { build } from 'esbuild';
+import { fileURLToPath } from 'node:url';
+const root = new URL('../', import.meta.url);
+const output = new URL('deployment/', root);
+await fs.mkdir(output, { recursive: true });
+await fs.cp(new URL('public/', root), output, { recursive: true });
+await build({ entryPoints:[fileURLToPath(new URL('src/worker.js',root))], outfile:fileURLToPath(new URL('deployment/_worker.js',root)), bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true });
+await fs.writeFile(new URL('_routes.json',output),JSON.stringify({version:1,include:['/api/*'],exclude:[]}));
+console.log('Cloudflare Pages package prepared. D1 and the server password-hash secret are required for staff edits.');
